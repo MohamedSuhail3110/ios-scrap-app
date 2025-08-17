@@ -1,0 +1,536 @@
+[
+  {
+   "Governorate": "Al Anbar",
+   "District": "Al-Qa'im",
+   "Capital City": "Al-Qa'im",
+   "Other Major Towns": "Kharab al-Jir, Qaim market"
+  },
+  {
+   "Governorate": "Al Anbar",
+   "District": "Ar-Rutba",
+   "Capital City": "Ar-Rutba",
+   "Other Major Towns": "Nukhayb, Akashat"
+  },
+  {
+   "Governorate": "Al Anbar",
+   "District": "Anah",
+   "Capital City": "Anah",
+   "Other Major Towns": "Rawa, Al-Qahtaniya"
+  },
+  {
+   "Governorate": "Al Anbar",
+   "District": "Fallujah",
+   "Capital City": "Fallujah",
+   "Other Major Towns": "Saqlawiyah, Amiriyat al-Fallujah"
+  },
+  {
+   "Governorate": "Al Anbar",
+   "District": "Haditha",
+   "Capital City": "Haditha",
+   "Other Major Towns": "Barwana, Haqlaniyah"
+  },
+  {
+   "Governorate": "Al Anbar",
+   "District": "Heet",
+   "Capital City": "Heet",
+   "Other Major Towns": "Kubaisa, Al-Baghdadi"
+  },
+  {
+   "Governorate": "Al Anbar",
+   "District": "Ramadi",
+   "Capital City": "Ramadi",
+   "Other Major Towns": "Khalidiya, Habbaniyah"
+  },
+  {
+   "Governorate": "Al Anbar",
+   "District": "Rawah",
+   "Capital City": "Rawah",
+   "Other Major Towns": "Qasr al-Izza"
+  },
+  {
+   "Governorate": "Babil",
+   "District": "Al-Mahawil",
+   "Capital City": "Al-Mahawil"
+  },
+  {
+   "Governorate": "Babil",
+   "District": "Al-Musayab",
+   "Capital City": "Al-Musayab",
+   "Other Major Towns": "Jurf al-Sakhar"
+  },
+  {
+   "Governorate": "Babil",
+   "District": "Hashimiya",
+   "Capital City": "Hashimiya"
+  },
+  {
+   "Governorate": "Babil",
+   "District": "Hilla",
+   "Capital City": "Hilla",
+   "Other Major Towns": "Al-Qasim, Al-Iskandariya"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Rusafa",
+   "Capital City": "Rusafa (Baghdad East)"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Adhamiyah",
+   "Capital City": "Adhamiyah"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Sadr City",
+   "Capital City": "Sadr City (Al-Sadr)"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "New Baghdad (9 Nissan)",
+   "Capital City": "New Baghdad"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Karkh",
+   "Capital City": "Karkh (Baghdad West)"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Kadhimyah",
+   "Capital City": "Kadhimyah"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Mansour",
+   "Capital City": "Mansour"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Al-Rashid",
+   "Capital City": "Al-Rashid"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Abu Ghraib",
+   "Capital City": "Abu Ghraib"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Mahmudiya",
+   "Capital City": "Mahmudiya"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Taji",
+   "Capital City": "Taji"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Tarmiya",
+   "Capital City": "Tarmiya"
+  },
+  {
+   "Governorate": "Baghdad",
+   "District": "Al-Mada'in",
+   "Capital City": "Al-Mada'in",
+   "Other Major Towns": "Sadr Al-Yusufiya"
+  },
+  {
+   "Governorate": "Basra",
+   "District": "Abu Al-Khaseeb",
+   "Capital City": "Abu Al-Khaseeb"
+  },
+  {
+   "Governorate": "Basra",
+   "District": "Al-Midaina",
+   "Capital City": "Al-Midaina"
+  },
+  {
+   "Governorate": "Basra",
+   "District": "Al-Qurna",
+   "Capital City": "Al-Qurna"
+  },
+  {
+   "Governorate": "Basra",
+   "District": "Al-Zubair",
+   "Capital City": "Al-Zubair"
+  },
+  {
+   "Governorate": "Basra",
+   "District": "Basrah",
+   "Capital City": "Basrah",
+   "Other Major Towns": "Umm Qasr"
+  },
+  {
+   "Governorate": "Basra",
+   "District": "Al-Faw",
+   "Capital City": "Al-Faw"
+  },
+  {
+   "Governorate": "Dhi Qar",
+   "District": "Al-Chibayish",
+   "Capital City": "Al-Chibayish"
+  },
+  {
+   "Governorate": "Dhi Qar",
+   "District": "Al-Rifa'i",
+   "Capital City": "Al-Rifa'i"
+  },
+  {
+   "Governorate": "Dhi Qar",
+   "District": "Al-Shatra",
+   "Capital City": "Al-Shatra"
+  },
+  {
+   "Governorate": "Dhi Qar",
+   "District": "Nasiriyah",
+   "Capital City": "Nasiriyah",
+   "Other Major Towns": "Qalat Sukkar"
+  },
+  {
+   "Governorate": "Dhi Qar",
+   "District": "Suq Al-Shoyukh",
+   "Capital City": "Suq Al-Shoyukh"
+  },
+  {
+   "Governorate": "Diyala",
+   "District": "Al-Khalis",
+   "Capital City": "Al-Khalis"
+  },
+  {
+   "Governorate": "Diyala",
+   "District": "Al-Muqdadiya",
+   "Capital City": "Al-Muqdadiya"
+  },
+  {
+   "Governorate": "Diyala",
+   "District": "Ba'quba",
+   "Capital City": "Ba'quba",
+   "Other Major Towns": "Khanaqin"
+  },
+  {
+   "Governorate": "Diyala",
+   "District": "Balad Ruz",
+   "Capital City": "Balad Ruz"
+  },
+  {
+   "Governorate": "Diyala",
+   "District": "Kifri",
+   "Capital City": "Kifri"
+  },
+  {
+   "Governorate": "Duhok",
+   "District": "Amadiya",
+   "Capital City": "Amadiya"
+  },
+  {
+   "Governorate": "Duhok",
+   "District": "Duhok",
+   "Capital City": "Duhok"
+  },
+  {
+   "Governorate": "Duhok",
+   "District": "Sumel",
+   "Capital City": "Sumel (Simele)"
+  },
+  {
+   "Governorate": "Duhok",
+   "District": "Zakho",
+   "Capital City": "Zakho",
+   "Other Major Towns": "Semsur"
+  },
+  {
+   "Governorate": "Erbil",
+   "District": "Erbil",
+   "Capital City": "Erbil (Hewlêr)",
+   "Other Major Towns": "Makhmur"
+  },
+  {
+   "Governorate": "Erbil",
+   "District": "Soran",
+   "Capital City": "Soran",
+   "Other Major Towns": "Choman"
+  },
+  {
+   "Governorate": "Erbil",
+   "District": "Shaqlawa",
+   "Capital City": "Shaqlawa"
+  },
+  {
+   "Governorate": "Erbil",
+   "District": "Koya",
+   "Capital City": "Koya"
+  },
+  {
+   "Governorate": "Erbil",
+   "District": "Mexmur",
+   "Capital City": "Mexmûr"
+  },
+  {
+   "Governorate": "Erbil",
+   "District": "Rewandiz",
+   "Capital City": "Rewandiz"
+  },
+  {
+   "Governorate": "Halabja",
+   "District": "Halabja",
+   "Capital City": "Halabja",
+   "Other Major Towns": "Sharbazher, Byara"
+  },
+  {
+   "Governorate": "Karbala",
+   "District": "Ain al-Tamur",
+   "Capital City": "Ain al-Tamur"
+  },
+  {
+   "Governorate": "Karbala",
+   "District": "Al-Hindiya",
+   "Capital City": "Al-Hindiya"
+  },
+  {
+   "Governorate": "Karbala",
+   "District": "Karbala",
+   "Capital City": "Karbala",
+   "Other Major Towns": "Ain al-Tamur area"
+  },
+  {
+   "Governorate": "Kirkuk",
+   "District": "Al-Hawiga",
+   "Capital City": "Al-Hawiga"
+  },
+  {
+   "Governorate": "Kirkuk",
+   "District": "Daquq",
+   "Capital City": "Daquq"
+  },
+  {
+   "Governorate": "Kirkuk",
+   "District": "Kirkuk",
+   "Capital City": "Kirkuk (Hawler)"
+  },
+  {
+   "Governorate": "Kirkuk",
+   "District": "Al-Dibs",
+   "Capital City": "Al-Dibs"
+  },
+  {
+   "Governorate": "Maysan",
+   "District": "Ali Al-Gharbi",
+   "Capital City": "Ali Al-Gharbi"
+  },
+  {
+   "Governorate": "Maysan",
+   "District": "Al-Kahla",
+   "Capital City": "Al-Kahla"
+  },
+  {
+   "Governorate": "Maysan",
+   "District": "Al-Maimouna",
+   "Capital City": "Al-Maimouna"
+  },
+  {
+   "Governorate": "Maysan",
+   "District": "Al-Mejar Al-Kabi",
+   "Capital City": "Al-Mejar Al-Kabi"
+  },
+  {
+   "Governorate": "Maysan",
+   "District": "Amarah",
+   "Capital City": "Amarah",
+   "Other Major Towns": "Qal'at Saleh"
+  },
+  {
+   "Governorate": "Muthanna",
+   "District": "Al-Khidhir",
+   "Capital City": "Al-Khidhir"
+  },
+  {
+   "Governorate": "Muthanna",
+   "District": "Al-Rumaitha",
+   "Capital City": "Al-Rumaitha"
+  },
+  {
+   "Governorate": "Muthanna",
+   "District": "Al-Salman",
+   "Capital City": "Al-Salman"
+  },
+  {
+   "Governorate": "Muthanna",
+   "District": "Al-Samawa",
+   "Capital City": "Al-Samawa"
+  },
+  {
+   "Governorate": "Najaf",
+   "District": "Al-Manathera",
+   "Capital City": "Al-Manathera"
+  },
+  {
+   "Governorate": "Najaf",
+   "District": "Kufa",
+   "Capital City": "Kufa"
+  },
+  {
+   "Governorate": "Najaf",
+   "District": "Najaf",
+   "Capital City": "Najaf",
+   "Other Major Towns": "Samarra?"
+  },
+  {
+   "Governorate": "Nineveh",
+   "District": "Akre",
+   "Capital City": "Akre"
+  },
+  {
+   "Governorate": "Nineveh",
+   "District": "Al-Ba'aj",
+   "Capital City": "Al-Ba'aj"
+  },
+  {
+   "Governorate": "Nineveh",
+   "District": "Al-Hamdaniya",
+   "Capital City": "Al-Hamdaniya",
+   "Other Major Towns": "Bakhdida (Qaraqosh)"
+  },
+  {
+   "Governorate": "Nineveh",
+   "District": "Hatra",
+   "Capital City": "Hatra"
+  },
+  {
+   "Governorate": "Nineveh",
+   "District": "Mosul",
+   "Capital City": "Mosul",
+   "Other Major Towns": "Hamam al-Alil"
+  },
+  {
+   "Governorate": "Nineveh",
+   "District": "Shekhan",
+   "Capital City": "Shekhan"
+  },
+  {
+   "Governorate": "Nineveh",
+   "District": "Sinjar",
+   "Capital City": "Sinjar",
+   "Other Major Towns": "Shingal"
+  },
+  {
+   "Governorate": "Nineveh",
+   "District": "Tel Afar",
+   "Capital City": "Tel Afar",
+   "Other Major Towns": "Agileh"
+  },
+  {
+   "Governorate": "Nineveh",
+   "District": "Tel Keppe",
+   "Capital City": "Tel Keppe",
+   "Other Major Towns": "Tel Kaif"
+  },
+  {
+   "Governorate": "Qadisiyyah",
+   "District": "Afaq",
+   "Capital City": "Afaq"
+  },
+  {
+   "Governorate": "Qadisiyyah",
+   "District": "Al-Shamiya",
+   "Capital City": "Al-Shamiya"
+  },
+  {
+   "Governorate": "Qadisiyyah",
+   "District": "Diwaniya",
+   "Capital City": "Diwaniya"
+  },
+  {
+   "Governorate": "Qadisiyyah",
+   "District": "Hamza",
+   "Capital City": "Hamza"
+  },
+  {
+   "Governorate": "Saladin",
+   "District": "Al-Daur",
+   "Capital City": "Al-Daur"
+  },
+  {
+   "Governorate": "Saladin",
+   "District": "Al-Shirqat",
+   "Capital City": "Al-Shirqat",
+   "Other Major Towns": "Sharqat area"
+  },
+  {
+   "Governorate": "Saladin",
+   "District": "Baiji",
+   "Capital City": "Baiji"
+  },
+  {
+   "Governorate": "Saladin",
+   "District": "Balad",
+   "Capital City": "Balad"
+  },
+  {
+   "Governorate": "Saladin",
+   "District": "Samarra",
+   "Capital City": "Samarra"
+  },
+  {
+   "Governorate": "Saladin",
+   "District": "Tikrit",
+   "Capital City": "Tikrit"
+  },
+  {
+   "Governorate": "Saladin",
+   "District": "Tooz (Tuz Khurmatu)",
+   "Capital City": "Tuz Khurmatu"
+  },
+  {
+   "Governorate": "Saladin",
+   "District": "Dujail",
+   "Capital City": "Dujail"
+  },
+  {
+   "Governorate": "Sulaymaniyah",
+   "District": "Sulaymaniyah",
+   "Capital City": "Sulaymaniyah (Slemani)",
+   "Other Major Towns": "Kalar, Ranya"
+  },
+  {
+   "Governorate": "Sulaymaniyah",
+   "District": "Chamchamal",
+   "Capital City": "Chamchamal"
+  },
+  {
+   "Governorate": "Sulaymaniyah",
+   "District": "Penjwen",
+   "Capital City": "Penjwen"
+  },
+  {
+   "Governorate": "Wasit",
+   "District": "Al-Azezia",
+   "Capital City": "Al-Azezia"
+  },
+  {
+   "Governorate": "Wasit",
+   "District": "Al-Hai",
+   "Capital City": "Al-Hai"
+  },
+  {
+   "Governorate": "Wasit",
+   "District": "Al-Na'maniya",
+   "Capital City": "Al-Na'maniya"
+  },
+  {
+   "Governorate": "Wasit",
+   "District": "Al-Suwaira",
+   "Capital City": "Al-Suwaira"
+  },
+  {
+   "Governorate": "Wasit",
+   "District": "Badra",
+   "Capital City": "Badra"
+  },
+  {
+   "Governorate": "Wasit",
+   "District": "Kut",
+   "Capital City": "Kut"
+  }
+]
+
