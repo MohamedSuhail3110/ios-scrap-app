@@ -1,0 +1,27 @@
+workflows:
+  ios-build:
+    name: iOS Build
+    environment:
+      vars:
+        XCODE_WORKSPACE: "ios-scrap-app.xcworkspace" # change if your workspace name is different
+        XCODE_SCHEME: "ios-scrap-app"                # change to your scheme name
+      node: latest
+      xcode: latest
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install
+          cd ios
+          pod install
+          cd ..
+      - name: Build ipa
+        script: |
+          xcode-project build-ipa \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        apple_id: scrapzoneglobal@gmail.com
+        password: Nopassamar85@
