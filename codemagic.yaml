@@ -2,6 +2,8 @@ workflows:
   ios-build:
     name: iOS Build
     environment:
+      groups:
+        - ios-build-secrets       # group where APP_STORE_CONNECT_PASSWORD is stored
       vars:
         XCODE_WORKSPACE: "ios-scrap-app.xcworkspace"
         XCODE_SCHEME: "ios-scrap-app"
