@@ -24,4 +24,4 @@ workflows:
     publishing:
       app_store_connect:
         apple_id: scrapzoneglobal@gmail.com
-        password: $APP_STORE_CONNECT_PASSWORD
+        password: $APP_STORE_CONNECT
