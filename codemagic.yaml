@@ -2,12 +2,19 @@ workflows:
   ios-build:
     name: iOS Build
     environment:
+      flutter: stable
+      xcode: latest
       vars:
-        APPLE_ID: "scrapzoneglobal@gmail.com"             # your Apple ID
-        APP_STORE_CONNECT_PASSWORD: "qevo-bkbi-hhmw-fppq" # app-specific password
+        APPLE_ID: "scrapzoneglobal@gmail.com"
+        APP_STORE_CONNECT_PASSWORD: "qevo-bkbi-hhmw-fppq"
     scripts:
-      - echo "Starting iOS build for $APPLE_ID"
-      - xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath $CM_BUILD_DIR/Runner.xcarchive
+      - name: Install dependencies
+        script: flutter pub get
+
+      - name: Build iOS
+        script: flutter build ipa --release --no-codesign
+    artifacts:
+      - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
         apple_id: $APPLE_ID
