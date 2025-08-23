@@ -3,8 +3,8 @@ workflows:
     name: iOS Build
     environment:
       vars:
-        XCODE_WORKSPACE: "ios-scrap-app.xcworkspace" # change if your workspace name is different
-        XCODE_SCHEME: "ios-scrap-app"                # change to your scheme name
+        XCODE_WORKSPACE: "ios-scrap-app.xcworkspace"
+        XCODE_SCHEME: "ios-scrap-app"
       node: latest
       xcode: latest
     scripts:
@@ -24,4 +24,4 @@ workflows:
     publishing:
       app_store_connect:
         apple_id: scrapzoneglobal@gmail.com
-        password: Nopassamar85@
+        password: $APP_STORE_CONNECT_PASSWORD
