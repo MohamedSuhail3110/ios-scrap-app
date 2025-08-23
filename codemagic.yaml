@@ -3,25 +3,12 @@ workflows:
     name: iOS Build
     environment:
       vars:
-        XCODE_WORKSPACE: "ios-scrap-app.xcworkspace"
-        XCODE_SCHEME: "ios-scrap-app"
-      node: latest
-      xcode: latest
+        APPLE_ID: "scrapzoneglobal@gmail.com"             # your Apple ID
+        APP_STORE_CONNECT_PASSWORD: "qevo-bkbi-hhmw-fppq" # app-specific password
     scripts:
-      - name: Install dependencies
-        script: |
-          npm install
-          cd ios
-          pod install
-          cd ..
-      - name: Build ipa
-        script: |
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
-    artifacts:
-      - build/ios/ipa/*.ipa
+      - echo "Starting iOS build for $APPLE_ID"
+      - xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath $CM_BUILD_DIR/Runner.xcarchive
     publishing:
       app_store_connect:
-        apple_id: scrapzoneglobal@gmail.com
+        apple_id: $APPLE_ID
         password: $APP_STORE_CONNECT_PASSWORD
