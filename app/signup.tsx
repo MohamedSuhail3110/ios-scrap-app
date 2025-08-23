@@ -23,6 +23,7 @@ import KeyboardAvoidingWrapper from '@/components/common/KeyboardAvoidingWrapper
 import AppHeader from '@/components/common/AppHeader';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
+import TermsAndConditionsModal from '@/components/common/TermsAndConditionsModal';
 
 // Validation schema will be created inside the component to access translations
 
@@ -32,6 +33,7 @@ export default function SignupScreen() {
   const dispatch = useDispatch();
   const { isAuthenticated, isInitialized } = useAuth();
   const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const [isModalVisible, setModalVisible] = useState(false);
 
   // Redirect authenticated users to main app
   useEffect(() => {
@@ -70,23 +72,53 @@ export default function SignupScreen() {
   const handleSignup = async (values: any) => {
     dispatch(setLoading(true));
     try {
+      // Validate required fields
+      if (!values.fullName || !values.email || !values.password) {
+        Toast.show({
+          type: 'error',
+          text1: t('common.error') || 'Error',
+          text2: t('auth.allFieldsRequired') || 'Name, email, and password are required.'
+        });
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(values.email)) {
+        Toast.show({
+          type: 'error',
+          text1: t('common.error') || 'Error',
+          text2: t('auth.invalidEmailFormat') || 'Please enter a valid email address.'
+        });
+        return;
+      }
+
       const payload = {
-        fullName: values.fullName,
-        email: values.email,
-        phone: values.phone,
-        governorate: values.governorate,
-        city: values.district, // API expects 'city' not 'district'
+        fullName: values.fullName.trim(),
+        email: values.email.trim().toLowerCase(),
+        phone: values.phone?.trim() || '',
+        governorate: values.governorate || '',
+        city: values.district || '', // API expects 'city' not 'district'
         password: values.password
       };
+
+      console.log('Sending signup request with payload:', { ...payload, password: '***' });
+      
       const res = await apiSignup(payload);
-      if (res) {
-        Toast.show({ type: 'success', text1: t('auth.accountCreated') || 'Account Created Successfully!' });
+      console.log('Signup response:', res);
+
+      if (res && res.success) {
+        Toast.show({ 
+          type: 'success', 
+          text1: t('auth.accountCreated') || 'Account Created Successfully!',
+          text2: t('auth.pleaseSignIn') || 'Please sign in with your new account.'
+        });
         router.replace('/signin');
       } else {
         Toast.show({ 
           type: 'error', 
           text1: t('auth.signupFailed') || 'Signup Failed', 
-          text2: t('auth.pleaseTryAgain') || 'Please try again later.' 
+          text2: (res?.message || t('auth.pleaseTryAgain')) || 'Please try again later.' 
         });
       }
     } catch (err: any) {
@@ -122,7 +154,7 @@ export default function SignupScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <AppHeader />
+
       <KeyboardAvoidingWrapper>
         <View style={styles.content}>
           <View style={styles.card}>
@@ -262,6 +294,11 @@ export default function SignupScreen() {
                 </View>
               )}
             </Formik>
+            <Pressable style={styles.termsContainer} onPress={() => setModalVisible(true)}>
+              <Text style={styles.termsText}>
+                <Text style={styles.termsLink}>{t('auth.termsAndConditions')}</Text>
+              </Text>
+            </Pressable>
           </View>
         </View>
       </KeyboardAvoidingWrapper>
@@ -270,6 +307,10 @@ export default function SignupScreen() {
           <ActivityIndicator size="large" color={colors.primary.green} />
         </View>
       )}
+      <TermsAndConditionsModal
+        visible={isModalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -401,5 +442,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.1)'
-  }
+  },
+  termsContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  termsText: {
+    color: colors.text.secondary,
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  termsLink: {
+    color: colors.primary.green,
+    textDecorationLine: 'underline',
+  },
 });

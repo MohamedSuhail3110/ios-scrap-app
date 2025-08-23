@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { Video } from 'expo-av';
+import { Video, ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ShoppingCart, DollarSign, Search } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -14,11 +14,19 @@ export default function HeroMobile() {
 
   const isRTL = i18n.language === 'ar' || i18n.language === 'ku';
 
-  const handleBuyClick = () => router.push('/buy');
+  const handleBuyClick = () => router.push('/(tabs)/buy');
   const handleSellClick = () => router.push('/sell');
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      router.push({ pathname: '/buy', params: { search: searchQuery } });
+      // Use router.push with the correct params structure for Expo Router
+      router.push({
+        pathname: '/(tabs)/buy',
+        params: {
+          query: searchQuery.trim()
+        }
+      });
+      // Clear the search input after navigation
+      setSearchQuery('');
     }
   };
 
@@ -30,7 +38,7 @@ export default function HeroMobile() {
           ref={videoRef}
           source={{ uri: 'https://sedge.in/Lokis_collections/sv.mp4' }}
           style={StyleSheet.absoluteFill}
-          resizeMode="cover"
+          resizeMode={ResizeMode.COVER}
           isLooping
           isMuted
           shouldPlay
@@ -100,7 +108,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   title: {
-    fontSize: 36,
+    fontSize: Platform.OS === 'android' ? 30 : 36,
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 12,

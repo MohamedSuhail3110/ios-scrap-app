@@ -177,7 +177,7 @@ export default function BuyScreen() {
   return (
 
     <>
-      <AppHeader />
+
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <ScrollView
           style={styles.scrollView}
@@ -210,14 +210,32 @@ export default function BuyScreen() {
                   <Search size={20} color={colors.gray[500]} />
                   <TextInput
                     style={styles.searchInput}
-                    placeholder={t('hero.searchPlaceholder')}
+                    placeholder={t('buy.searchPlaceholder') || 'Search parts...'}
                     placeholderTextColor={colors.gray[500]}
                     value={filters.searchQuery}
                     onChangeText={(v) => setFilters(prev => ({ ...prev, searchQuery: v }))}
                   />
+                  {filters.searchQuery ? (
+                    <TouchableOpacity
+                      onPress={() => setFilters(prev => ({ ...prev, searchQuery: '' }))}
+                      style={styles.clearSearch}
+                    >
+                      <X size={16} color={colors.gray[500]} />
+                    </TouchableOpacity>
+                  ) : null}
                 </View>
-                <TouchableOpacity style={styles.filterButton} onPress={() => setIsFilterVisible(true)}>
-                  <Filter size={20} color={colors.primary.green} />
+                <TouchableOpacity 
+                  style={[
+                    styles.filterButton,
+                    (selectedCategory || filters.district || filters.brand || filters.model) && styles.filterButtonActive
+                  ]} 
+                  onPress={() => setIsFilterVisible(true)}
+                >
+                  <Filter size={20} color={
+                    (selectedCategory || filters.district || filters.brand || filters.model)
+                      ? colors.text.white
+                      : colors.primary.green
+                  } />
                 </TouchableOpacity>
               </View>
             </View>
@@ -231,7 +249,7 @@ export default function BuyScreen() {
                               <Text style={styles.resultsCount}>{filteredProducts.length} {t('buy.productsFound')}</Text>
             </View>
 
-            <View style={styles.controlsRight}>
+            {/* <View style={styles.controlsRight}>
               <View style={styles.viewModeContainer}>
                 <TouchableOpacity
                   style={[styles.viewModeButton, viewMode === 'grid' && styles.activeViewMode]}
@@ -246,7 +264,7 @@ export default function BuyScreen() {
                   <List size={18} color={viewMode === 'list' ? colors.text.white : colors.gray[500]} />
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
           </View>
 
           {/* Products Grid */}
@@ -345,7 +363,16 @@ export default function BuyScreen() {
               ) : null}
 
               <View style={styles.modalFooter}>
-                <TouchableOpacity style={[styles.resetBtn]} onPress={() => setFilters({ searchQuery: '', district: '', brand: '', model: '' })}>
+                <TouchableOpacity 
+                  style={[styles.resetBtn]} 
+                  onPress={() => {
+                    // Reset all filters
+                    setFilters({ searchQuery: '', district: '', brand: '', model: '' });
+                    setSelectedCategory(null);
+                    // Close the modal after reset
+                    setIsFilterVisible(false);
+                  }}
+                >
                   <Text style={styles.resetBtnText}>{t('buy.reset')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.applyBtn]} onPress={() => setIsFilterVisible(false)}>
@@ -437,6 +464,9 @@ const styles = StyleSheet.create({
     fontSize: width < 400 ? 14 : 16,
     color: colors.text.primary
   },
+  clearSearch: {
+    padding: 8,
+  },
   filterButton: {
     backgroundColor: colors.background.primary,
     borderRadius: 12,
@@ -446,6 +476,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4
+  },
+  filterButtonActive: {
+    backgroundColor: colors.primary.green,
   },
   filtersSection: {
     backgroundColor: colors.background.primary,

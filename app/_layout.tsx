@@ -16,6 +16,7 @@ function RootLayoutNav() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="signin" />
       <Stack.Screen name="signup" />
+      <Stack.Screen name="sell" />
       <Stack.Screen name="product-details" />
       <Stack.Screen name="edit-profile" />
       <Stack.Screen name="my-ads" />

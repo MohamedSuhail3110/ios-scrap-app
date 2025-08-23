@@ -10,9 +10,8 @@ export const API_BASE_URL =
 export const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: false, // Avoid CORS/session issues on mobile
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // Do not set a global Content-Type. Axios will set correct headers per request
+  headers: {},
 });
 
 async function getToken(): Promise<string | null> {
@@ -58,9 +57,31 @@ api.interceptors.response.use(
 // -----------------------
 // Auth
 // -----------------------
-export const signup = async (payload: { fullName: string; email: string; password: string; phone?: string; city?: string; governorate?: string }) => {
-  const { data } = await api.post('/api/auth/signup', payload);
-  return data;
+export const signup = async (payload: { 
+  fullName: string; 
+  email: string; 
+  password: string; 
+  phone?: string; 
+  city?: string; 
+  governorate?: string 
+}) => {
+  try {
+    // Convert the payload to match the expected format
+    const formattedPayload = {
+      name: payload.fullName, // server expects 'name' instead of 'fullName'
+      email: payload.email,
+      password: payload.password,
+      phone: payload.phone || '',
+      city: payload.city || '',
+      governorate: payload.governorate || '',
+    };
+
+    const { data } = await api.post('/api/auth/signup', formattedPayload);
+    return data;
+  } catch (error: any) {
+    console.error('Signup error:', error.response?.data);
+    throw error;
+  }
 };
 
 export const login = async (payload: { email: string; password: string }) => {
@@ -167,9 +188,26 @@ export const fetchAllPartsData = async (params: Record<string, any> = {}) => {
 // Legacy Sell compatibility
 // -----------------------
 export const createSellItem = async (formData: FormData) => {
-  const { data } = await api.post('/api/sell', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  // Let Axios set the correct multipart boundary automatically
+  const { data } = await api.post('/api/sell', formData);
+
+  // Create a notification for the new sell item
+  try {
+    const userId = formData.get('userId')?.toString() || '';
+    if (userId && data?.sell?._id) {
+      await addNotification(userId, {
+        type: 'ad_upload',
+        title: 'New Product Listed',
+        message: `Your product "${formData.get('partName')}" has been successfully listed.`,
+        timestamp: new Date(),
+        read: false,
+        adId: data.sell._id
+      });
+    }
+  } catch (error) {
+    console.error('Failed to create notification for new sell item:', error);
+  }
+
   return data;
 };
 
@@ -206,9 +244,7 @@ export const fetchUserSellItems = async (userId: string) => {
 // Additions
 // -----------------------
 export const createAddition = async (formData: FormData) => {
-  const { data } = await api.post('/api/addition', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  const { data } = await api.post('/api/addition', formData);
   return data;
 };
 
@@ -260,8 +296,23 @@ export const fetchAllUsers = async (params: { page?: number; limit?: number } = 
 };
 
 export const updateUserById = async (userId: string, payload: { name?: string; phone?: string; city?: string }) => {
-  const { data } = await api.put(`/api/admin/users/${userId}`, payload);
-  return data;
+  try {
+    // Try regular user update endpoint first
+    const { data } = await api.put(`/api/users/${userId}`, payload);
+    return data;
+  } catch (err) {
+    console.log('Regular update failed, trying alternate endpoints');
+    try {
+      // Try auth update endpoint
+      const { data } = await api.put(`/api/auth/users/${userId}`, payload);
+      return data;
+    } catch (err2) {
+      console.log('Auth update failed, trying admin endpoint');
+      // Fall back to admin endpoint
+      const { data } = await api.put(`/api/admin/users/${userId}`, payload);
+      return data;
+    }
+  }
 };
 
 export const deleteUserById = async (userId: string) => {
@@ -366,6 +417,82 @@ export const deletePartById = async (partId: string, hardDelete: boolean = false
   } catch (err: any) {
     console.error(`❌ Delete failed for part ${partId}:`, err?.response?.status, err?.response?.data);
     throw err;
+  }
+};
+
+// -----------------------
+// Notifications
+// -----------------------
+export const fetchUserNotifications = async (userId: string) => {
+  try {
+    // Get notifications from local storage
+    const storedNotifications = await AsyncStorage.getItem(`notifications_${userId}`);
+    const notifications = storedNotifications ? JSON.parse(storedNotifications) : [];
+    console.log('Fetched notifications from storage:', notifications);
+    return { notifications };
+  } catch (error) {
+    console.error('Failed to fetch notifications:', error);
+    return { notifications: [] };
+  }
+};
+
+export const addNotification = async (userId: string, notification: {
+  type: "ad_upload" | "login" | "system";
+  title: string;
+  message: string;
+  timestamp: Date;
+  read: boolean;
+  adId?: string;
+}) => {
+  try {
+    // Get existing notifications
+    const storedNotifications = await AsyncStorage.getItem(`notifications_${userId}`);
+    const notifications = storedNotifications ? JSON.parse(storedNotifications) : [];
+    
+    // Check for duplicate notification if it's an ad_upload type
+    if (notification.type === 'ad_upload' && notification.adId) {
+      const isDuplicate = notifications.some((n: any) => 
+        n.type === 'ad_upload' && n.adId === notification.adId
+      );
+      if (isDuplicate) {
+        console.log('Duplicate ad notification, skipping');
+        return { success: false, reason: 'duplicate' };
+      }
+    }
+
+    // Add new notification
+    const newNotification = { 
+      id: Date.now().toString(), 
+      ...notification,
+      timestamp: new Date().toISOString() // Ensure timestamp is a string
+    };
+    
+    const newNotifications = [newNotification, ...notifications]; // Add to start of array
+    await AsyncStorage.setItem(`notifications_${userId}`, JSON.stringify(newNotifications));
+    console.log('Added new notification:', newNotification);
+    return { success: true, notification: newNotification };
+  } catch (error) {
+    console.error('Failed to add notification:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+};
+
+export const markNotificationRead = async (userId: string, notificationId: string) => {
+  try {
+    const storedNotifications = await AsyncStorage.getItem(`notifications_${userId}`);
+    if (!storedNotifications) return { success: false, reason: 'no-notifications' };
+
+    const notifications = JSON.parse(storedNotifications);
+    const updatedNotifications = notifications.map((n: any) => 
+      n.id === notificationId ? { ...n, read: true } : n
+    );
+
+    await AsyncStorage.setItem(`notifications_${userId}`, JSON.stringify(updatedNotifications));
+    console.log('Marked notification as read:', notificationId);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to mark notification as read:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 };
 

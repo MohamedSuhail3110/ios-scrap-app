@@ -110,7 +110,7 @@ const SellStatusPage = () => {
                 </View>
                 <View style={styles.contactInfo}>
                   <Text style={styles.contactLabel}>{t('sellStatus.assistance.phone')}</Text>
-                  <Text>+1 (555) 123-4567</Text>
+                  <Text style={styles.contactValue}>+1 (555) 123-4567</Text>
                 </View>
               </View>
               <View style={styles.contactItem}>
@@ -119,7 +119,7 @@ const SellStatusPage = () => {
                 </View>
                 <View style={styles.contactInfo}>
                   <Text style={styles.contactLabel}>{t('sellStatus.assistance.email')}</Text>
-                  <Text>support@scrap.com</Text>
+                  <Text style={styles.contactValue}>support@scrap.com</Text>
                 </View>
               </View>
             </View>

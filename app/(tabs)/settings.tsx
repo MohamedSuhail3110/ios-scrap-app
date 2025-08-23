@@ -43,6 +43,7 @@ import { fetchUserSellItems, deletePartById, api, updateUserById, API_BASE_URL }
 import { governorates } from '@/lib/iraqLocations';
 import AppHeader from '@/components/common/AppHeader';
 import { useAuth } from '@/hooks/useAuth';
+import { fetchUserNotifications, markNotificationRead } from '@/lib/api';
 
 // Types
 type Sell = {
@@ -103,6 +104,7 @@ export default function SettingsScreen() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   // Helper functions
   const getCurrentUserId = (): string | null => {
@@ -266,17 +268,22 @@ export default function SettingsScreen() {
       }
 
       // Update profile via API
-      await updateUserById(currentUserId, {
+      // Update the user profile in the backend
+      const updateResponse = await updateUserById(currentUserId, {
         name: editData.name.trim(),
         phone: editData.phone.trim(),
         city: editData.city.trim()
       });
+      
+      console.log('Profile update response:', updateResponse);
 
-      // Update local state without clearing user
+      // Update local state with the response data
       dispatch(updateUserProfile({
         fullName: editData.name.trim(),
         phone: editData.phone.trim(),
-        governorate: editData.city.trim()
+        governorate: editData.city.trim(),
+        city: editData.city.trim(),
+        ...(updateResponse?.user || {}) // Include any additional user data from the response
       }));
       
       setIsEditing(false);
@@ -356,25 +363,34 @@ export default function SettingsScreen() {
     }
   }, [activeTab, user?._id]);
 
-  // 2. Fix notifications to display real notifications for the user
+  // Fetch and handle notifications
   useEffect(() => {
-    // Example: fetch notifications from backend or local storage
-    // Replace this with your actual notification fetching logic
     const fetchNotifications = async () => {
-      // Simulate fetching notifications for the current user
-      // Replace with real API call if available
       const currentUserId = getCurrentUserId();
       if (!currentUserId) return;
+      
       try {
-        // Example: const res = await api.get(`/api/notifications/${currentUserId}`);
-        // setUserNotifications(res.data.notifications);
-        // For now, simulate with empty array or mock data
-        setUserNotifications([]); // Replace with real data
+        const notificationsData = await fetchUserNotifications(currentUserId);
+        const notifications = Array.isArray(notificationsData?.notifications) 
+          ? notificationsData.notifications 
+          : Array.isArray(notificationsData) 
+            ? notificationsData 
+            : [];
+            
+        console.log('Fetched notifications:', notifications);
+        setUserNotifications(notifications);
       } catch (err) {
+        console.error('Error fetching notifications:', err);
         setUserNotifications([]);
       }
     };
+    
     fetchNotifications();
+    
+    // Set up an interval to fetch notifications
+    const interval = setInterval(fetchNotifications, 60000); // Refresh every minute
+    
+    return () => clearInterval(interval);
   }, [user?._id]);
 
   // Redirect to login if not authenticated
@@ -501,18 +517,23 @@ export default function SettingsScreen() {
                   <TouchableOpacity
                     style={styles.formInput}
                     onPress={() => {
-                      // Show city picker
-                      Alert.alert(
-                        t('settings.selectCity'),
-                        t('settings.chooseYourCity'),
-                        [
-                          ...governorates.map(city => ({
-                            text: city,
-                            onPress: () => setEditData(prev => ({ ...prev, city }))
-                          })),
-                          { text: t('common.cancel'), style: 'cancel' }
-                        ]
-                      );
+                      if (Platform.OS === 'android') {
+                        // Use Modal for Android
+                        setModalVisible(true);
+                      } else {
+                        // Use Alert for iOS
+                        Alert.alert(
+                          t('settings.selectCity'),
+                          t('settings.chooseYourCity'),
+                          [
+                            ...governorates.map(city => ({
+                              text: city,
+                              onPress: () => setEditData(prev => ({ ...prev, city }))
+                            })),
+                            { text: t('common.cancel'), style: 'cancel' }
+                          ]
+                        );
+                      }
                     }}
                   >
                     <Text style={[styles.formValue, { color: editData.city ? colors.text.primary : colors.text.secondary }]}>
@@ -523,6 +544,51 @@ export default function SettingsScreen() {
                   <Text style={styles.formValue}>{(user as any)?.city || t('settings.notProvided')}</Text>
                 )}
               </View>
+
+              {/* City Selection Modal for Android */}
+              <Modal
+                visible={modalVisible}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setModalVisible(false)}
+              >
+                <View style={styles.cityModalOverlay}>
+                  <View style={styles.cityModalContent}>
+                    <View style={styles.cityModalHeader}>
+                      <Text style={styles.cityModalTitle}>{t('settings.selectCity')}</Text>
+                      <TouchableOpacity onPress={() => setModalVisible(false)}>
+                        <X size={24} color={colors.text.primary} />
+                      </TouchableOpacity>
+                    </View>
+                    <ScrollView style={styles.cityModalList}>
+                      {governorates.map((city, index) => (
+                        <TouchableOpacity
+                          key={city}
+                          style={[
+                            styles.cityModalItem,
+                            index !== governorates.length - 1 && styles.cityModalItemBorder,
+                            editData.city === city && styles.cityModalItemSelected
+                          ]}
+                          onPress={() => {
+                            setEditData(prev => ({ ...prev, city }));
+                            setModalVisible(false);
+                          }}
+                        >
+                          <Text style={[
+                            styles.cityModalItemText,
+                            editData.city === city && styles.cityModalItemTextSelected
+                          ]}>
+                            {city}
+                          </Text>
+                          {editData.city === city && (
+                            <CheckCircle size={20} color={colors.primary.green} />
+                          )}
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+                </View>
+              </Modal>
             </View>
           </View>
         );
@@ -657,11 +723,63 @@ export default function SettingsScreen() {
               </ScrollView>
             </View>
 
-            <View style={styles.emptyState}>
-              <Bell size={48} color={colors.gray[300]} />
-              <Text style={styles.emptyStateText}>{t('settings.noNotificationsFound')}</Text>
-              <Text style={styles.emptyStateSubtext}>{t('settings.notificationsWillAppear')}</Text>
-            </View>
+            {userNotifications.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Bell size={48} color={colors.gray[300]} />
+                <Text style={styles.emptyStateText}>{t('settings.noNotificationsFound')}</Text>
+                <Text style={styles.emptyStateSubtext}>{t('settings.notificationsWillAppear')}</Text>
+              </View>
+            ) : (
+              <ScrollView style={styles.notificationsList}>
+                {userNotifications
+                  .filter(notification => {
+                    switch (notificationFilter) {
+                      case 'unread':
+                        return !notification.read;
+                      case 'ad_upload':
+                        return notification.type === 'ad_upload';
+                      case 'login':
+                        return notification.type === 'login';
+                      case 'system':
+                        return notification.type === 'system';
+                      default:
+                        return true;
+                    }
+                  })
+                  .map((notification) => (
+                    <TouchableOpacity
+                      key={notification.id}
+                      style={[
+                        styles.notificationItem,
+                        !notification.read && styles.notificationUnread
+                      ]}
+                      onPress={async () => {
+                        // Mark as read when clicked
+                        const currentUserId = getCurrentUserId();
+                        if (currentUserId) {
+                          await markNotificationRead(currentUserId, notification.id);
+                          // Update local state
+                          setUserNotifications(prev => 
+                            prev.map(n => 
+                              n.id === notification.id ? { ...n, read: true } : n
+                            )
+                          );
+                        }
+                      }}
+                    >
+                      <View style={styles.notificationContent}>
+                        <View style={styles.notificationHeader}>
+                          <Text style={styles.notificationTitle}>{notification.title}</Text>
+                          <Text style={styles.notificationTime}>
+                            {new Date(notification.timestamp).toLocaleDateString()}
+                          </Text>
+                        </View>
+                        <Text style={styles.notificationMessage}>{notification.message}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
+            )}
           </View>
         );
 
@@ -679,7 +797,7 @@ export default function SettingsScreen() {
 
   return (
     <>
-      <AppHeader />
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollViewContent}
@@ -836,7 +954,8 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingBottom: 120
+    paddingBottom: 120,
+    marginTop:40
   },
   scrollViewContent: {
     paddingBottom: 120 // Ensure content doesn't overlap with tab bar
@@ -1166,11 +1285,12 @@ const styles = StyleSheet.create({
     marginBottom: 12
   },
   languageOptionsContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.background.primary,
     borderRadius: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderWidth: 1,
     borderColor: colors.gray[200],
     shadowColor: colors.gray[900],
@@ -1186,7 +1306,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 12,
     gap: 12,
-    width: '33.33%', // For 3 options
+    width: '50.33%', // For 3 options
   },
   languageOptionActive: {
     backgroundColor: colors.primary.green,
@@ -1272,7 +1392,7 @@ const styles = StyleSheet.create({
     color: colors.error
   },
 
-  // Modal
+    // Modal
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -1341,4 +1461,94 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     marginBottom: 4
   },
+
+  // City Modal Styles
+  cityModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end', // Modal appears from bottom
+  },
+  cityModalContent: {
+    backgroundColor: colors.background.primary,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+    maxHeight: '80%',
+  },
+  cityModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray[200],
+  },
+  cityModalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text.primary,
+  },
+  cityModalList: {
+    padding: 16,
+  },
+  cityModalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+  },
+  cityModalItemBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray[100],
+  },
+  cityModalItemSelected: {
+    backgroundColor: colors.primary.green + '10',
+  },
+  cityModalItemText: {
+    fontSize: 16,
+    color: colors.text.primary,
+  },
+  cityModalItemTextSelected: {
+    color: colors.primary.green,
+    fontWeight: '600',
+  },
+
+  // Notification Styles
+  notificationsList: {
+    maxHeight: 400
+  },
+  notificationItem: {
+    backgroundColor: colors.background.primary,
+    borderRadius: 12,
+    marginBottom: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.gray[200]
+  },
+  notificationUnread: {
+    backgroundColor: colors.gray[50],
+    borderColor: colors.primary.green
+  },
+  notificationContent: {
+    gap: 8
+  },
+  notificationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  notificationTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text.primary
+  },
+  notificationTime: {
+    fontSize: 12,
+    color: colors.text.secondary
+  },
+  notificationMessage: {
+    fontSize: 14,
+    color: colors.text.primary,
+    lineHeight: 20
+  }
 });

@@ -26,6 +26,7 @@ import KeyboardAvoidingWrapper from '@/components/common/KeyboardAvoidingWrapper
 import AppHeader from '@/components/common/AppHeader';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
+import TermsAndConditionsModal from '@/components/common/TermsAndConditionsModal';
 
 export default function SignInScreen() {
   const { t } = useTranslation();
@@ -33,6 +34,7 @@ export default function SignInScreen() {
   const dispatch = useDispatch();
   const { login, isAuthenticated, isInitialized } = useAuth();
   const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const [isModalVisible, setModalVisible] = useState(false);
 
   // Redirect authenticated users to main app
   useEffect(() => {
@@ -141,7 +143,7 @@ export default function SignInScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <AppHeader />
+
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
@@ -230,6 +232,11 @@ export default function SignInScreen() {
                     </View>
                   )}
                 </Formik>
+                <Pressable style={styles.termsContainer} onPress={() => setModalVisible(true)}>
+                  <Text style={styles.termsText}>
+                    <Text style={styles.termsLink}>{t('auth.termsAndConditions')}</Text>
+                  </Text>
+                </Pressable>
               </View>
             </View>
           </KeyboardAvoidingWrapper>
@@ -240,6 +247,10 @@ export default function SignInScreen() {
           <ActivityIndicator size="large" color={colors.primary.green} />
         </View>
       )}
+       <TermsAndConditionsModal
+        visible={isModalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -364,5 +375,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.1)'
-  }
+  },
+  termsContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  termsText: {
+    color: colors.text.secondary,
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  termsLink: {
+    color: colors.primary.green,
+    textDecorationLine: 'underline',
+  },
 });

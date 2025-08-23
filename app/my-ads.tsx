@@ -121,7 +121,7 @@ export default function MyAdsScreen() {
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={true}>
         <View style={styles.content}>
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
@@ -139,9 +139,10 @@ export default function MyAdsScreen() {
           </View>
 
           {userAds.length > 0 ? (
-            <View style={styles.adsContainer}>
-              {userAds.map((ad) => (
-                <View key={ad._id} style={styles.adCard}>
+            <ScrollView style={{ maxHeight: 600 }} showsVerticalScrollIndicator={true}>
+              <View style={styles.adsContainer}>
+                {userAds.map((ad) => (
+                  <View key={ad._id} style={styles.adCard}>
                   <SafeImage 
                     source={{ uri: ad.images?.[0] || ad.image }} 
                     style={styles.adImage}
@@ -189,8 +190,9 @@ export default function MyAdsScreen() {
                     </View>
                   </View>
                 </View>
-              ))}
-            </View>
+                ))}
+              </View>
+            </ScrollView>
           ) : (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>No ads found</Text>

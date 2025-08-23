@@ -498,7 +498,7 @@ export default function HomeScreen() {
 
   return (
     <>
-      <AppHeader />
+      
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <ScrollView 
           style={styles.scrollView} 

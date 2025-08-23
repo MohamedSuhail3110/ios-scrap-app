@@ -6,14 +6,6 @@ import en from './locales/en.json';
 import ku from './locales/ku.json';
 import ar from './locales/ar.json';
 
-const setRTL = (lng: string) => {
-  const isRTL = lng === 'ar';
-  if (I18nManager.isRTL !== isRTL) {
-    I18nManager.forceRTL(isRTL);
-    // Optionally reload the app to apply RTL changes
-  }
-};
-
 i18n
   .use(initReactI18next)
   .init({
@@ -32,8 +24,11 @@ i18n
     }
   });
 
-// Listen for language changes to update RTL
- i18n.on('languageChanged', setRTL);
-setRTL(i18n.language);
+// Keep layout LTR for all languages
+i18n.on('languageChanged', () => {
+  if (I18nManager.isRTL) {
+    I18nManager.forceRTL(false);
+  }
+});
 
 export default i18n;

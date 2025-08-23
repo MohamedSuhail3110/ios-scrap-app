@@ -68,15 +68,22 @@ export default function ProductDetailsScreen() {
   // Function to refresh seller details
   const refreshSellerDetails = async () => {
     if (!product?.sellerId) return;
-    
+
     setSellerLoading(true);
     try {
-      const updatedSellerDetails = await fetchSellerDetails(product.sellerId, product);
+      const updatedSellerDetails = await fetchSellerDetails(
+        product.sellerId,
+        product
+      );
       if (updatedSellerDetails) {
-        setProduct(prev => prev ? {
-          ...prev,
-          ...updatedSellerDetails
-        } : prev);
+        setProduct((prev) =>
+          prev
+            ? {
+                ...prev,
+                ...updatedSellerDetails,
+              }
+            : prev
+        );
         showMessage('Seller details updated');
       }
     } catch (error) {
@@ -108,7 +115,7 @@ export default function ProductDetailsScreen() {
         const userEndpoints = [
           `/api/admin/users/${userId}`,
           `/api/users/${userId}`,
-          `/api/auth/users/${userId}`
+          `/api/auth/users/${userId}`,
         ];
 
         for (const endpoint of userEndpoints) {
@@ -120,7 +127,10 @@ export default function ProductDetailsScreen() {
               break;
             }
           } catch (userError: any) {
-            console.warn(`Failed to fetch from ${endpoint}:`, userError?.response?.status);
+            console.warn(
+              `Failed to fetch from ${endpoint}:`,
+              userError?.response?.status
+            );
             continue;
           }
         }
@@ -132,7 +142,7 @@ export default function ProductDetailsScreen() {
       const listingEndpoints = [
         `/api/parts?seller=${userId}&status=active`,
         `/api/parts?userId=${userId}&isActive=true`,
-        `/api/sell/user/${userId}`
+        `/api/sell/user/${userId}`,
       ];
 
       for (const endpoint of listingEndpoints) {
@@ -141,23 +151,36 @@ export default function ProductDetailsScreen() {
           if (listingsResponse.data) {
             if (Array.isArray(listingsResponse.data)) {
               activeListingsCount = listingsResponse.data.length;
-            } else if (listingsResponse.data.sells && Array.isArray(listingsResponse.data.sells)) {
-              activeListingsCount = listingsResponse.data.sells.filter((item: any) => item.isActive !== false).length;
-            } else if (listingsResponse.data.data && Array.isArray(listingsResponse.data.data)) {
+            } else if (
+              listingsResponse.data.sells &&
+              Array.isArray(listingsResponse.data.sells)
+            ) {
+              activeListingsCount = listingsResponse.data.sells.filter(
+                (item: any) => item.isActive !== false
+              ).length;
+            } else if (
+              listingsResponse.data.data &&
+              Array.isArray(listingsResponse.data.data)
+            ) {
               activeListingsCount = listingsResponse.data.data.length;
             }
-            console.log(`Successfully fetched listings from ${endpoint}, count: ${activeListingsCount}`);
+            console.log(
+              `Successfully fetched listings from ${endpoint}, count: ${activeListingsCount}`
+            );
             break;
           }
         } catch (listingsError: any) {
-          console.warn(`Failed to fetch listings from ${endpoint}:`, listingsError?.response?.status);
+          console.warn(
+            `Failed to fetch listings from ${endpoint}:`,
+            listingsError?.response?.status
+          );
           continue;
         }
       }
 
       // Combine all available seller data
       const combinedSellerData = sellerData || additionalInfo || {};
-      
+
       const userData: {
         sellerName: string;
         sellerPhone: string;
@@ -177,10 +200,18 @@ export default function ProductDetailsScreen() {
         businessName: string;
         websiteUrl: string;
       } = {
-        sellerName: combinedSellerData.name || combinedSellerData.fullName || partData?.sellerName || 'Seller',
+        sellerName:
+          combinedSellerData.name ||
+          combinedSellerData.fullName ||
+          partData?.sellerName ||
+          'Seller',
         sellerPhone: combinedSellerData.phone || partData?.sellerPhone || '',
         sellerEmail: combinedSellerData.email || partData?.sellerEmail || '',
-        sellerCity: combinedSellerData.city || combinedSellerData.governorate || partData?.city || '',
+        sellerCity:
+          combinedSellerData.city ||
+          combinedSellerData.governorate ||
+          partData?.city ||
+          '',
         sellerDistrict: combinedSellerData.district || partData?.district || '',
         sellerAvatar: combinedSellerData.avatar || '',
         sellerVerified: combinedSellerData.isVerified || false,
@@ -238,11 +269,11 @@ export default function ProductDetailsScreen() {
         if (response.success && response.data) {
           // Map the API response to Product type
           const apiProduct = response.data;
-          
+
           // Fetch seller details if we have a seller ID
           const sellerId = String(apiProduct.seller || apiProduct.userId || '');
           let sellerDetails = null;
-          
+
           if (sellerId) {
             sellerDetails = await fetchSellerDetails(sellerId, apiProduct);
           }
@@ -274,15 +305,25 @@ export default function ProductDetailsScreen() {
               ? apiProduct.features
               : [],
             sellerId: sellerId,
-            sellerName: sellerDetails?.sellerName || String(apiProduct.sellerName || ''),
-            sellerPhone: sellerDetails?.sellerPhone || String(apiProduct.sellerPhone || ''),
-            sellerEmail: sellerDetails?.sellerEmail || String(apiProduct.sellerEmail || ''),
-            sellerCity: sellerDetails?.sellerCity || String(apiProduct.city || ''),
-            sellerDistrict: sellerDetails?.sellerDistrict || String(apiProduct.district || ''),
+            sellerName:
+              sellerDetails?.sellerName || String(apiProduct.sellerName || ''),
+            sellerPhone:
+              sellerDetails?.sellerPhone ||
+              String(apiProduct.sellerPhone || ''),
+            sellerEmail:
+              sellerDetails?.sellerEmail ||
+              String(apiProduct.sellerEmail || ''),
+            sellerCity:
+              sellerDetails?.sellerCity || String(apiProduct.city || ''),
+            sellerDistrict:
+              sellerDetails?.sellerDistrict ||
+              String(apiProduct.district || ''),
             sellerAvatar: sellerDetails?.sellerAvatar || '',
             sellerVerified: sellerDetails?.sellerVerified || false,
             sellerStatus: sellerDetails?.sellerStatus || 'active',
-            sellerType: sellerDetails?.sellerType as 'individual' | 'business' || 'individual',
+            sellerType:
+              (sellerDetails?.sellerType as 'individual' | 'business') ||
+              'individual',
             sellerRating: sellerDetails?.sellerRating || 0,
             totalReviews: sellerDetails?.totalReviews || 0,
             totalSales: sellerDetails?.totalSales || 0,
@@ -404,7 +445,7 @@ export default function ProductDetailsScreen() {
       const userEndpoints = [
         `/api/admin/users/${product.sellerId}`,
         `/api/users/${product.sellerId}`,
-        `/api/auth/users/${product.sellerId}`
+        `/api/auth/users/${product.sellerId}`,
       ];
 
       for (const endpoint of userEndpoints) {
@@ -417,7 +458,10 @@ export default function ProductDetailsScreen() {
             break;
           }
         } catch (apiError: any) {
-          console.warn(`Failed to fetch seller from ${endpoint}:`, apiError?.response?.status);
+          console.warn(
+            `Failed to fetch seller from ${endpoint}:`,
+            apiError?.response?.status
+          );
           continue;
         }
       }
@@ -428,10 +472,14 @@ export default function ProductDetailsScreen() {
           const partResponse = await api.get(`/api/parts/${id}`);
           if (partResponse.data) {
             const partData = partResponse.data;
-            sellerWhatsApp = partData.sellerPhone || partData.seller?.phone || partData.phone;
+            sellerWhatsApp =
+              partData.sellerPhone || partData.seller?.phone || partData.phone;
           }
         } catch (partError) {
-          console.warn('Could not fetch part data for phone number:', partError);
+          console.warn(
+            'Could not fetch part data for phone number:',
+            partError
+          );
         }
       }
 
@@ -442,7 +490,7 @@ export default function ProductDetailsScreen() {
       // Format the WhatsApp number
       const formattedNumber = sellerWhatsApp.replace(/\s+/g, '');
       let whatsAppNumber = formattedNumber;
-      
+
       // Handle Iraqi phone number formatting
       if (!formattedNumber.startsWith('+')) {
         if (formattedNumber.startsWith('0')) {
@@ -453,23 +501,41 @@ export default function ProductDetailsScreen() {
           whatsAppNumber = `+964${formattedNumber}`;
         }
       }
-      
-      const sellerName = sellerProfile?.name || sellerProfile?.fullName || product.sellerName || '';
-      const message = `Hi${sellerName ? ` ${sellerName}` : ''}, I'm interested in your ${
-        product.partName
-      } for ${formatPrice(product.price)}. Can you provide more details?`;
-      
-      const whatsappUrl = `whatsapp://send?phone=${whatsAppNumber}&text=${encodeURIComponent(message)}`;
+
+      const sellerName =
+        sellerProfile?.name ||
+        sellerProfile?.fullName ||
+        product.sellerName ||
+        '';
+      const message = `Hi${
+        sellerName ? ` ${sellerName}` : ''
+      }, I'm interested in your ${product.partName} for ${formatPrice(
+        product.price
+      )}. Can you provide more details?`;
+
+      const whatsappUrl = `whatsapp://send?phone=${whatsAppNumber}&text=${encodeURIComponent(
+        message
+      )}`;
 
       // Update product state with seller info if available
       if (sellerProfile) {
-        setProduct(prev => prev ? {
-          ...prev,
-          sellerPhone: sellerProfile.phone || prev.sellerPhone,
-          sellerName: sellerProfile.name || sellerProfile.fullName || prev.sellerName,
-          sellerCity: sellerProfile.city || sellerProfile.governorate || prev.sellerCity,
-          sellerDistrict: sellerProfile.district || prev.sellerDistrict,
-        } : prev);
+        setProduct((prev) =>
+          prev
+            ? {
+                ...prev,
+                sellerPhone: sellerProfile.phone || prev.sellerPhone,
+                sellerName:
+                  sellerProfile.name ||
+                  sellerProfile.fullName ||
+                  prev.sellerName,
+                sellerCity:
+                  sellerProfile.city ||
+                  sellerProfile.governorate ||
+                  prev.sellerCity,
+                sellerDistrict: sellerProfile.district || prev.sellerDistrict,
+              }
+            : prev
+        );
       }
 
       // Try to open WhatsApp
@@ -488,10 +554,9 @@ export default function ProductDetailsScreen() {
           throw new Error('Cannot open WhatsApp or phone dialer');
         }
       }
-      
     } catch (error: any) {
       console.error('Contact error:', error);
-      
+
       if (error?.message?.includes('contact information')) {
         showMessage(error.message);
       } else if (product.sellerPhone) {
@@ -605,25 +670,31 @@ export default function ProductDetailsScreen() {
               <View style={styles.sellerProfileCard}>
                 <View style={styles.sellerAvatarContainer}>
                   {product.sellerAvatar ? (
-                    <Image 
-                      source={{ uri: product.sellerAvatar }} 
+                    <Image
+                      source={{ uri: product.sellerAvatar }}
                       style={styles.sellerAvatar}
                     />
                   ) : (
                     <Text style={styles.sellerAvatarText}>
-                      {product.sellerName ? product.sellerName[0].toUpperCase() : 'S'}
+                      {product.sellerName
+                        ? product.sellerName[0].toUpperCase()
+                        : 'S'}
                     </Text>
                   )}
                 </View>
-                
+
                 <View style={styles.sellerDetailsContainer}>
                   <View style={styles.sellerHeaderRow}>
                     <Text style={styles.sellerNameLarge}>
-                      {product.sellerType === 'business' ? product.businessName : product.sellerName || 'Seller'}
+                      {product.sellerType === 'business'
+                        ? product.businessName
+                        : product.sellerName || 'Seller'}
                     </Text>
-                    {product.sellerVerified && <CheckCircle size={20} color={colors.success} />}
+                    {product.sellerVerified && (
+                      <CheckCircle size={20} color={colors.success} />
+                    )}
                   </View>
-                  
+
                   {/* Seller metrics */}
                   {/* <View style={styles.sellerMetrics}>
                     {product.sellerRating !== undefined && (
@@ -653,13 +724,17 @@ export default function ProductDetailsScreen() {
                       {product.successRate && (
                         <View style={styles.rateItem}>
                           <Text style={styles.rateLabel}>Success Rate</Text>
-                          <Text style={styles.rateValue}>{product.successRate}%</Text>
+                          <Text style={styles.rateValue}>
+                            {product.successRate}%
+                          </Text>
                         </View>
                       )}
                       {product.responseRate && (
                         <View style={styles.rateItem}>
                           <Text style={styles.rateLabel}>Response Rate</Text>
-                          <Text style={styles.rateValue}>{product.responseRate}%</Text>
+                          <Text style={styles.rateValue}>
+                            {product.responseRate}%
+                          </Text>
                         </View>
                       )}
                     </View>
@@ -668,39 +743,56 @@ export default function ProductDetailsScreen() {
               </View>
 
               {/* Business Information (if applicable) */}
-              {product.sellerType === 'business' && product.businessRegistration && (
-                <View style={styles.infoCard}>
-                  <Text style={styles.infoCardTitle}>Business Information</Text>
-                  <View style={styles.contactItem}>
-                    <Text style={styles.contactLabel}>Registration:</Text>
-                    <Text style={styles.contactValue}>{product.businessRegistration}</Text>
+              {product.sellerType === 'business' &&
+                product.businessRegistration && (
+                  <View style={styles.infoCard}>
+                    <Text style={styles.infoCardTitle}>
+                      Business Information
+                    </Text>
+                    <View style={styles.contactItem}>
+                      <Text style={styles.contactLabel}>Registration:</Text>
+                      <Text style={styles.contactValue}>
+                        {product.businessRegistration}
+                      </Text>
+                    </View>
+                    {product.websiteUrl && (
+                      <TouchableOpacity
+                        style={styles.websiteLink}
+                        onPress={() =>
+                          product.websiteUrl
+                            ? Linking.openURL(product.websiteUrl)
+                            : null
+                        }
+                      >
+                        <Text style={styles.websiteLinkText}>
+                          Visit Website
+                        </Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
-                  {product.websiteUrl && (
-                    <TouchableOpacity 
-                      style={styles.websiteLink}
-                      onPress={() => product.websiteUrl ? Linking.openURL(product.websiteUrl) : null}
-                    >
-                      <Text style={styles.websiteLinkText}>Visit Website</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              )}
+                )}
 
               {/* Location and Contact Hours */}
               <View style={styles.infoCard}>
-                <Text style={styles.infoCardTitle}>Location & Availability</Text>
+                <Text style={styles.infoCardTitle}>
+                  Location & Availability
+                </Text>
                 {(product.sellerCity || product.sellerDistrict) && (
                   <View style={styles.contactItem}>
                     <Text style={styles.contactLabel}>Location:</Text>
                     <Text style={styles.contactValue}>
-                      {[product.sellerCity, product.sellerDistrict].filter(Boolean).join(', ')}
+                      {[product.sellerCity, product.sellerDistrict]
+                        .filter(Boolean)
+                        .join(', ')}
                     </Text>
                   </View>
                 )}
                 {product.availableHours && (
                   <View style={styles.contactItem}>
                     <Text style={styles.contactLabel}>Available Hours:</Text>
-                    <Text style={styles.contactValue}>{product.availableHours}</Text>
+                    <Text style={styles.contactValue}>
+                      {product.availableHours}
+                    </Text>
                   </View>
                 )}
                 {product.lastActive && (
@@ -717,17 +809,22 @@ export default function ProductDetailsScreen() {
               <View style={styles.sellerContact}>
                 <View style={styles.contactTitleRow}>
                   <Text style={styles.contactTitle}>Contact Information</Text>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.refreshButton}
                     onPress={refreshSellerDetails}
                     disabled={sellerLoading}
                   >
-                    <Text style={[styles.refreshButtonText, sellerLoading && styles.refreshButtonDisabled]}>
+                    <Text
+                      style={[
+                        styles.refreshButtonText,
+                        sellerLoading && styles.refreshButtonDisabled,
+                      ]}
+                    >
                       {sellerLoading ? 'Refreshing...' : 'Refresh'}
                     </Text>
                   </TouchableOpacity>
                 </View>
-                
+
                 {!product.sellerPhone ? (
                   <Text style={styles.noContactText}>
                     Contact information will be available after clicking Buy Now
@@ -736,25 +833,35 @@ export default function ProductDetailsScreen() {
                   <>
                     <View style={styles.contactItem}>
                       <Text style={styles.contactLabel}>Name:</Text>
-                      <Text style={styles.contactValue}>{product.sellerName || 'Seller'}</Text>
+                      <Text style={styles.contactValue}>
+                        {product.sellerName || 'Seller'}
+                      </Text>
                     </View>
-                    
+
                     <View style={styles.contactItem}>
                       <Text style={styles.contactLabel}>Mobile:</Text>
-                      <Text style={styles.contactValue}>{product.sellerPhone}</Text>
+                      <Text style={styles.contactValue}>
+                        {product.sellerPhone}
+                      </Text>
                     </View>
 
                     {product.sellerEmail && (
                       <View style={styles.contactItem}>
                         <Text style={styles.contactLabel}>Email:</Text>
-                        <Text style={styles.contactValue}>{product.sellerEmail}</Text>
+                        <Text style={styles.contactValue}>
+                          {product.sellerEmail}
+                        </Text>
                       </View>
                     )}
-                    
+
                     {product.preferredContactMethod && (
                       <View style={styles.contactItem}>
-                        <Text style={styles.contactLabel}>Preferred Contact:</Text>
-                        <Text style={styles.contactValue}>{product.preferredContactMethod}</Text>
+                        <Text style={styles.contactLabel}>
+                          Preferred Contact:
+                        </Text>
+                        <Text style={styles.contactValue}>
+                          {product.preferredContactMethod}
+                        </Text>
                       </View>
                     )}
                   </>
@@ -762,12 +869,14 @@ export default function ProductDetailsScreen() {
               </View>
 
               {/* WhatsApp Contact Button */}
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.whatsappButton}
                 onPress={handleWhatsAppContact}
               >
                 <MessageCircle size={20} color={colors.text.white} />
-                <Text style={styles.whatsappButtonText}>Contact via WhatsApp</Text>
+                <Text style={styles.whatsappButtonText}>
+                  Contact via WhatsApp
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -781,7 +890,6 @@ export default function ProductDetailsScreen() {
   return (
     <>
       <View style={styles.container}>
-        <AppHeader />
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={handleBack}>
@@ -985,6 +1093,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray[200],
+    marginTop: 30,
   },
   backButton: {
     padding: 8,

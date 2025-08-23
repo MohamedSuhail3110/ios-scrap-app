@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,9 @@ import { ArrowLeft, Bell, ShoppingCart, MessageCircle, Star, Truck, CircleAlert 
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { colors } from '@/constants/colors';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/store';
+import { markAsRead as markAsReadAction } from '@/store/notificationsSlice';
 
 interface NotificationSetting {
   id: string;
@@ -22,78 +25,13 @@ interface NotificationSetting {
   type: 'push' | 'email' | 'sms';
 }
 
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  time: string;
-  type: 'order' | 'message' | 'review' | 'delivery' | 'system';
-  read: boolean;
-}
-
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    title: 'Order Delivered',
-    message: 'Your Toyota Camry brake pads have been delivered successfully',
-    time: '2 hours ago',
-    type: 'delivery',
-    read: false
-  },
-  {
-    id: '2',
-    title: 'New Message',
-    message: 'Ahmed Hassan sent you a message about Honda Civic oil filter',
-    time: '5 hours ago',
-    type: 'message',
-    read: false
-  },
-  {
-    id: '3',
-    title: 'Review Request',
-    message: 'Please rate your recent purchase from Sara Mohammed',
-    time: '1 day ago',
-    type: 'review',
-    read: true
-  },
-  {
-    id: '4',
-    title: 'Order Confirmed',
-    message: 'Your order #12345 has been confirmed and is being processed',
-    time: '2 days ago',
-    type: 'order',
-    read: true
-  },
-  {
-    id: '5',
-    title: 'System Update',
-    message: 'New features have been added to the app. Check them out!',
-    time: '3 days ago',
-    type: 'system',
-    read: true
-  },
-  {
-    id: '6',
-    title: 'Price Drop Alert',
-    message: 'Honda Civic parts are now 20% off. Limited time offer!',
-    time: '4 days ago',
-    type: 'system',
-    read: false
-  },
-  {
-    id: '7',
-    title: 'Delivery Scheduled',
-    message: 'Your Nissan Altima headlight will be delivered tomorrow',
-    time: '5 days ago',
-    type: 'delivery',
-    read: true
-  }
-];
+// Notifications now come from Redux store
 
 export default function NotificationsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const dispatch = useDispatch();
+  const notifications = useSelector((state: RootState) => state.notifications.items);
   const [notificationSettings, setNotificationSettings] = useState<NotificationSetting[]>([
     {
       id: '1',
@@ -142,19 +80,15 @@ export default function NotificationsScreen() {
   };
 
   const toggleNotificationSetting = (id: string) => {
-    setNotificationSettings(settings =>
-      settings.map(setting =>
+    setNotificationSettings((settings: NotificationSetting[]) =>
+      settings.map((setting: NotificationSetting) =>
         setting.id === id ? { ...setting, enabled: !setting.enabled } : setting
       )
     );
   };
 
   const markAsRead = (id: string) => {
-    setNotifications(notifications =>
-      notifications.map(notification =>
-        notification.id === id ? { ...notification, read: true } : notification
-      )
-    );
+    dispatch(markAsReadAction(id));
   };
 
   const getNotificationIcon = (type: string) => {
@@ -179,7 +113,7 @@ export default function NotificationsScreen() {
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -197,7 +131,7 @@ export default function NotificationsScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Notification Settings</Text>
             <View style={styles.settingsContainer}>
-              {notificationSettings.map((setting) => {
+              {notificationSettings.map((setting: NotificationSetting) => {
                 const IconComponent = setting.icon;
                 return (
                   <View key={setting.id} style={styles.settingItem}>

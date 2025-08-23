@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "bolt-expo-nativewind",
-    "slug": "bolt-expo-nativewind",
+    "name": "Scrap",
+    "slug": "scrap",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.boltexponativewind"
+      "bundleIdentifier": "com.scrap.app"
     },
     "web": {
       "bundler": "metro",
@@ -27,12 +27,12 @@
       "typedRoutes": true
     },
     "android": {
-      "package": "com.anonymous.boltexponativewind"
+      "package": "com.scrap.app"
     },
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "42333ad7-8a3e-4cbe-965e-8bc553f791b2"
+        "projectId": "6de86879-c08c-4836-ba1a-4aef0fb78466"
       }
     },
     "owner": "loki00"
