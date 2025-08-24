@@ -32,6 +32,7 @@ workflows:
         script: |
           if [ ! -d "ios" ]; then
             echo "⚡ No ios/ folder found, generating with eject..."
+            npm install --save-dev @react-native-community/cli
             npx react-native eject
           fi
 
