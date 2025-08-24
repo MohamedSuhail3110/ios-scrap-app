@@ -28,12 +28,11 @@ workflows:
         script: |
           npm install
 
-      - name: Generate ios/ folder if missing
+      - name: Generate ios/ folder with Expo
         script: |
           if [ ! -d "ios" ]; then
-            echo "⚡ No ios/ folder found, generating with eject..."
-            npm install --save-dev @react-native-community/cli
-            npx react-native eject
+            echo "⚡ No ios/ folder found, generating with expo prebuild..."
+            npx expo prebuild
           fi
 
       - name: Install iOS dependencies
