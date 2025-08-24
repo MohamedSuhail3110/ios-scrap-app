@@ -5,7 +5,24 @@ workflows:
       vars:
         APPLE_ID: scrapzoneglobal@gmail.com
         APP_SPECIFIC_PASSWORD: $APP_SPECIFIC_PASSWORD
+        CM_CERT_PASSWORD: testpassword
+      xcode: latest
     scripts:
+      - name: Decode and install certificate
+        script: |
+          base64 --decode ci/ios_certificate_p12_base64.txt > ios_certificate.p12
+          security create-keychain -p "" build.keychain
+          security import ios_certificate.p12 -P "$CM_CERT_PASSWORD" -A -t cert -f pkcs12
+          security list-keychains -d user -s build.keychain
+          security default-keychain -d user -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings build.keychain
+
+      - name: Install provisioning profile
+        script: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          base64 --decode ci/scrap_mobileprovision_base64.txt > ~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
+
       - name: Install JS dependencies
         script: |
           npm install
