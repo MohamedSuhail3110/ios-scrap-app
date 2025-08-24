@@ -11,6 +11,7 @@ workflows:
     scripts:
       - name: Decode and install certificate
         script: |
+          echo "🔐 Installing distribution certificate..."
           base64 -D -i ci/ios_certificate_p12_base64.txt -o ios_certificate.p12
           security create-keychain -p "" build.keychain
           security import ios_certificate.p12 -P "$CM_CERT_PASSWORD" -A -t cert -f pkcs12
@@ -21,6 +22,7 @@ workflows:
 
       - name: Install provisioning profile
         script: |
+          echo "📱 Installing provisioning profile..."
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           base64 -D -i ci/comscrapglobal_mobileprovision_base64.txt -o ~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
 
@@ -32,7 +34,7 @@ workflows:
         script: |
           if [ ! -d "ios" ]; then
             echo "⚡ No ios/ folder found, generating with expo prebuild..."
-            npx expo prebuild
+            npx expo prebuild --clean
           fi
 
       - name: Install iOS dependencies
@@ -41,13 +43,21 @@ workflows:
           pod install --repo-update
           cd ..
 
-      - name: Build iOS
+      - name: Build iOS archive
         script: |
-          xcodebuild -workspace ios/Scrap.xcworkspace \
+          echo "🏗 Building iOS archive..."
+          xcodebuild \
+            -workspace ios/Scrap.xcworkspace \
             -scheme Scrap \
             -sdk iphoneos \
-            -configuration Release archive \
-            -archivePath $CM_BUILD_DIR/Scrap.xcarchive
+            -configuration Release \
+            archive \
+            -archivePath $CM_BUILD_DIR/Scrap.xcarchive \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            DEVELOPMENT_TEAM=""
+            # You can leave DEVELOPMENT_TEAM empty for Individual account, Codemagic uses profile
 
     publishing:
       app_store_connect:
