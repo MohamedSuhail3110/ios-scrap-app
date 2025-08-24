@@ -19,6 +19,7 @@ workflows:
 
       - name: Generate iOS project
         script: |
+          rm -rf ios
           npx expo prebuild --platform ios --non-interactive --clean
 
       - name: Install CocoaPods
@@ -41,6 +42,6 @@ workflows:
       - ios_archive.xcarchive
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/Products/Release-iphoneos/*.ipa
     publishing:
-      email:
-        recipients:
-          - scrapzoneglobal@gmail.com
+      app_store_connect:
+        apple_id: scrapzoneglobal@gmail.com
+        password: $APPLE_ID_APP_PASSWORD
