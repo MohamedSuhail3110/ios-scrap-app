@@ -8,42 +8,33 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.scrap.global", 
-      "buildNumber": "1.0.0"
+      "bundleIdentifier": "com.scrap.global"
     },
-
-    "android": {
-      "package": "com.scrap.global",
-      "versionCode": 1
-    },
-
     "web": {
       "bundler": "metro",
       "output": "single",
       "favicon": "./assets/images/favicon.png",
       "template": "./web-build/index.html"
     },
-
     "plugins": [
       "expo-router",
       "expo-font",
       "expo-web-browser"
     ],
-
     "experiments": {
       "typedRoutes": true
     },
-
+    "android": {
+      "package": "com.scrap.global"
+    },
     "extra": {
       "router": {},
       "eas": {
         "projectId": "6de86879-c08c-4836-ba1a-4aef0fb78466"
       }
     },
-
     "owner": "loki00"
   }
 }
