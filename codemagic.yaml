@@ -1,49 +1,55 @@
 workflows:
-  ios-workflow:
-    name: Build iOS IPA for Scrap
+  ios-build:
+    name: iOS Build
     environment:
       vars:
-        XCODE_WORKSPACE: "ios/Scrap.xcworkspace"
-        XCODE_SCHEME: "Scrap"
-        BUNDLE_ID: "com.scrap.global"
-        APPLE_TEAM_ID: YOUR_TEAM_ID_HERE   # Replace with your Apple Team ID
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: "com.scrap.global"
-      groups:
-        - ios_credentials
+        APPLE_ID: scrapzoneglobal@gmail.com
+        APP_SPECIFIC_PASSWORD: aqce-btsv-rllm-khlk
+        CM_CERT_PASSWORD: testpassword
+      xcode: latest
+
     scripts:
-      - name: Install dependencies
+      - name: Decode and install certificate
+        script: |
+          base64 -D -i ci/ios_certificate_p12_base64.txt -o ios_certificate.p12
+          security create-keychain -p "" build.keychain
+          security import ios_certificate.p12 -P "$CM_CERT_PASSWORD" -A -t cert -f pkcs12
+          security list-keychains -d user -s build.keychain
+          security default-keychain -d user -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings build.keychain
+
+      - name: Install provisioning profile
+        script: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          base64 -D -i ci/scrap_mobileprovision_base64.txt -o ~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
+
+      - name: Install JS dependencies
         script: |
           npm install
-      - name: Prebuild Expo project
+
+      - name: Generate ios/ folder with Expo
         script: |
-          npx expo prebuild --platform ios --non-interactive
-      - name: Install CocoaPods
+          if [ ! -d "ios" ]; then
+            echo "⚡ No ios/ folder found, generating with expo prebuild..."
+            npx expo prebuild
+          fi
+
+      - name: Install iOS dependencies
         script: |
           cd ios
-          pod install
+          pod install --repo-update
           cd ..
+
       - name: Build iOS
         script: |
-          xcodebuild \
-            -workspace "$XCODE_WORKSPACE" \
-            -scheme "$XCODE_SCHEME" \
-            -configuration Release \
+          xcodebuild -workspace ios/Scrap.xcworkspace \
+            -scheme Scrap \
             -sdk iphoneos \
-            -archivePath $CM_BUILD_DIR/ios_archive.xcarchive archive \
-            DEVELOPMENT_TEAM=$APPLE_TEAM_ID \
-            PRODUCT_BUNDLE_IDENTIFIER=$BUNDLE_ID
+            -configuration Release archive \
+            -archivePath $CM_BUILD_DIR/Scrap.xcarchive
 
-          xcodebuild \
-            -exportArchive \
-            -archivePath $CM_BUILD_DIR/ios_archive.xcarchive \
-            -exportOptionsPlist ios/exportOptions.plist \
-            -exportPath $CM_BUILD_DIR/ipa
-    artifacts:
-      - $CM_BUILD_DIR/ipa/*.ipa
     publishing:
       app_store_connect:
         apple_id: $APPLE_ID
         password: $APP_SPECIFIC_PASSWORD
-        submit_to_testflight: true
