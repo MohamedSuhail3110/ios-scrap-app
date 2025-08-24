@@ -45,7 +45,10 @@ workflows:
 
       - name: Build iOS archive
         script: |
-          echo "🏗 Building iOS archive..."
+          echo "🏗 Building iOS archive with manual code signing..."
+          PROFILE_UUID=$(grep -a -A1 "<key>UUID</key>" ~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision | grep -oE "([A-F0-9-]{36})")
+          echo "✅ Using Provisioning Profile UUID: $PROFILE_UUID"
+
           xcodebuild \
             -workspace ios/Scrap.xcworkspace \
             -scheme Scrap \
@@ -55,9 +58,18 @@ workflows:
             -archivePath $CM_BUILD_DIR/Scrap.xcarchive \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="" \
-            DEVELOPMENT_TEAM=""
-            # You can leave DEVELOPMENT_TEAM empty for Individual account, Codemagic uses profile
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
+            DEVELOPMENT_TEAM="" \
+            PRODUCT_BUNDLE_IDENTIFIER="com.scrap.global"
+
+      - name: Export IPA
+        script: |
+          echo "📦 Exporting .ipa file..."
+          xcodebuild \
+            -exportArchive \
+            -archivePath $CM_BUILD_DIR/Scrap.xcarchive \
+            -exportOptionsPlist ios/exportOptions.plist \
+            -exportPath $CM_BUILD_DIR/ios_output
 
     publishing:
       app_store_connect:
