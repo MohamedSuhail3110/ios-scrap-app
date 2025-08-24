@@ -3,75 +3,36 @@ workflows:
     name: iOS Build
     environment:
       vars:
-        APPLE_ID: scrapzoneglobal@gmail.com
-        APP_SPECIFIC_PASSWORD: aqce-btsv-rllm-khlk
-        CM_CERT_PASSWORD: testpassword
-      xcode: latest
-
+        XCODE_WORKSPACE: "Scrap.xcworkspace"
+        XCODE_SCHEME: "Scrap"
     scripts:
-      - name: Decode and install certificate
-        script: |
-          echo "🔐 Installing distribution certificate..."
-          base64 -D -i ci/ios_certificate_p12_base64.txt -o ios_certificate.p12
-          security create-keychain -p "" build.keychain
-          security import ios_certificate.p12 -P "$CM_CERT_PASSWORD" -A -t cert -f pkcs12
-          security list-keychains -d user -s build.keychain
-          security default-keychain -d user -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security set-keychain-settings build.keychain
-
-      - name: Install provisioning profile
-        script: |
-          echo "📱 Installing provisioning profile..."
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          base64 -D -i ci/comscrapglobal_mobileprovision_base64.txt -o ~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
-
+      # 1. Install JS dependencies
       - name: Install JS dependencies
-        script: |
-          npm install
+        script: npm install
 
+      # 2. Generate ios/ folder on Codemagic Mac machine
       - name: Generate ios/ folder with Expo
         script: |
-          if [ ! -d "ios" ]; then
-            echo "⚡ No ios/ folder found, generating with expo prebuild..."
-            npx expo prebuild --clean
-          fi
+          npx expo prebuild --platform ios --non-interactive
 
-      - name: Install iOS dependencies
+      # 3. Install iOS dependencies
+      - name: Install CocoaPods
         script: |
           cd ios
-          pod install --repo-update
+          pod install
           cd ..
 
+      # 4. Build iOS archive
       - name: Build iOS archive
         script: |
-          echo "🏗 Building iOS archive with manual code signing..."
-          PROFILE_UUID=$(grep -a -A1 "<key>UUID</key>" ~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision | grep -oE "([A-F0-9-]{36})")
-          echo "✅ Using Provisioning Profile UUID: $PROFILE_UUID"
-
           xcodebuild \
-            -workspace ios/Scrap.xcworkspace \
-            -scheme Scrap \
-            -sdk iphoneos \
+            -workspace "$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME" \
             -configuration Release \
+            -archivePath $CM_BUILD_DIR/ios_archive.xcarchive \
             archive \
-            -archivePath $CM_BUILD_DIR/Scrap.xcarchive \
-            CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
-            DEVELOPMENT_TEAM="" \
-            PRODUCT_BUNDLE_IDENTIFIER="com.scrap.global"
+            PROVISIONING_PROFILE_SPECIFIER="match AppStore Scrap"
 
-      - name: Export IPA
-        script: |
-          echo "📦 Exporting .ipa file..."
-          xcodebuild \
-            -exportArchive \
-            -archivePath $CM_BUILD_DIR/Scrap.xcarchive \
-            -exportOptionsPlist ios/exportOptions.plist \
-            -exportPath $CM_BUILD_DIR/ios_output
-
-    publishing:
-      app_store_connect:
-        apple_id: $APPLE_ID
-        password: $APP_SPECIFIC_PASSWORD
+    artifacts:
+      - $CM_BUILD_DIR/ios_archive.xcarchive
