@@ -3,9 +3,9 @@ workflows:
     name: iOS Build
     environment:
       vars:
-        APPLE_ID: scrapzoneglobal@gmail.com
+        APPLE_ID: $APPLE_ID
         APP_SPECIFIC_PASSWORD: $APP_SPECIFIC_PASSWORD
-        CM_CERT_PASSWORD: testpassword
+        CM_CERT_PASSWORD: $CM_CERT_PASSWORD
       xcode: latest
     scripts:
       - name: Decode and install certificate
