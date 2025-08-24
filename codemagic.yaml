@@ -22,7 +22,7 @@ workflows:
       - name: Install provisioning profile
         script: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          base64 -D -i ci/scrap_mobileprovision_base64.txt -o ~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
+          base64 -D -i ci/comscrapglobal_mobileprovision_base64.txt -o ~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
 
       - name: Install JS dependencies
         script: |
